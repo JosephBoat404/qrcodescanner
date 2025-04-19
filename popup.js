@@ -1,11 +1,26 @@
 document.addEventListener('DOMContentLoaded', function() {
   const scanButton = document.getElementById('scanButton');
-  const resultDiv = document.getElementById('result');
-  const previewImg = document.getElementById('preview');
+  const preview = document.getElementById('preview');
+  const previewContainer = document.getElementById('previewContainer');
+  const result = document.getElementById('result');
+  const resultLabel = document.getElementById('resultLabel');
+  const resultActions = document.getElementById('resultActions');
+  const openUrlBtn = document.getElementById('openUrlBtn');
+  const copyBtn = document.getElementById('copyBtn');
+  const statusMessage = document.getElementById('statusMessage');
+  const loadingBar = document.getElementById('loadingBar');
 
-  // Use only screenshot functionality, no camera
-  scanButton.addEventListener('click', async () => {
+  // Initially hide results and actions
+  result.style.display = 'none';
+  resultActions.style.display = 'none';
+  resultLabel.style.display = 'none';
+
+  scanButton.addEventListener('click', async function() {
     try {
+      // Show loading animation
+      loadingBar.style.display = 'block';
+      statusMessage.textContent = 'Scanning page for QR codes...';
+      
       // Get the current active tab
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       
@@ -24,8 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       // Show preview of the screenshot
-      previewImg.src = dataUrl;
-      previewImg.style.display = 'block';
+      previewContainer.style.display = 'block';
+      preview.src = dataUrl;
+      preview.style.display = 'block';
       
       // Create an image element to load the screenshot
       const img = new Image();
@@ -52,48 +68,83 @@ document.addEventListener('DOMContentLoaded', function() {
           if (code) {
             handleQRCodeResult(code.data);
           } else {
-            resultDiv.textContent = 'No QR code found in the current page.';
+            result.textContent = 'No QR code found in the current page.';
+            result.style.display = 'block';
+            resultLabel.style.display = 'block';
+            resultActions.style.display = 'none';
+            statusMessage.textContent = 'No QR code detected.';
           }
         } catch (error) {
           console.error('Error processing image:', error);
-          resultDiv.textContent = `Error processing image: ${error.message}`;
+          result.textContent = `Error processing image: ${error.message}`;
+          result.style.display = 'block';
+          resultLabel.style.display = 'block';
+          resultActions.style.display = 'none';
+          statusMessage.textContent = 'Error processing image.';
+        } finally {
+          loadingBar.style.display = 'none';
         }
       };
 
       img.onerror = () => {
-        throw new Error('Failed to load screenshot image');
+        loadingBar.style.display = 'none';
+        statusMessage.textContent = 'Failed to load screenshot image.';
       };
 
       img.src = dataUrl;
     } catch (error) {
       console.error('Error:', error);
-      resultDiv.textContent = `Error: ${error.message}`;
+      loadingBar.style.display = 'none';
+      statusMessage.textContent = `Error: ${error.message}`;
     }
   });
 
   function handleQRCodeResult(text) {
-    // Clear any previous results
-    resultDiv.innerHTML = '';
-    
-    // Create a text element
-    const textElement = document.createElement('div');
-    textElement.textContent = text;
-    resultDiv.appendChild(textElement);
+    // Show result
+    result.textContent = text;
+    result.style.display = 'block';
+    resultLabel.style.display = 'block';
+    resultActions.style.display = 'flex';
     
     // Check if the result is a URL
     try {
       const url = new URL(text);
       if (url.protocol === 'http:' || url.protocol === 'https:') {
-        const openButton = document.createElement('button');
-        openButton.textContent = 'Open URL';
-        openButton.className = 'open-url-btn';
-        openButton.onclick = () => {
-          chrome.tabs.create({ url: text });
-        };
-        resultDiv.appendChild(openButton);
+        openUrlBtn.style.display = 'flex';
+      } else {
+        openUrlBtn.style.display = 'none';
       }
     } catch (e) {
-      // Not a valid URL, no need to do anything
+      openUrlBtn.style.display = 'none';
     }
+    
+    statusMessage.textContent = 'QR code detected!';
   }
+
+  openUrlBtn.addEventListener('click', function() {
+    const url = result.textContent;
+    if (url) {
+      chrome.tabs.create({ url: url });
+      statusMessage.textContent = 'Opening URL in new tab...';
+      setTimeout(() => {
+        statusMessage.textContent = '';
+      }, 2000);
+    }
+  });
+
+  copyBtn.addEventListener('click', function() {
+    const text = result.textContent;
+    if (text) {
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          statusMessage.textContent = 'Copied to clipboard!';
+          setTimeout(() => {
+            statusMessage.textContent = '';
+          }, 2000);
+        })
+        .catch(err => {
+          statusMessage.textContent = 'Failed to copy: ' + err;
+        });
+    }
+  });
 });

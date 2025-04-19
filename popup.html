@@ -1,60 +1,229 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>QR Code Scanner</title>
   <style>
-    body {
-      width: 300px;
-      padding: 10px;
-      font-family: Arial, sans-serif;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
+    
+    body {
+      width: 350px;
+      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      color: black;
+      background-color: wheat;
+      padding: 0px;
+    }
+    
     .container {
       display: flex;
       flex-direction: column;
       align-items: center;
+      background-color: black;
+      border-radius: 8px;
+      padding: 20px;
     }
-    button {
-      margin: 10px 0;
-      padding: 8px 16px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    #result {
-      margin-top: 10px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+    
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
       width: 100%;
-      word-break: break-all;
     }
-    .open-url-btn {
-      margin-top: 8px;
-      background-color: #2196F3;
+    
+    .header-icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 12px;
+      color: #4361ee;
     }
-    .open-url-btn:hover {
-      background-color: #0b7dda;
+    
+    h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
     }
-    #preview {
-      max-width: 100%;
+    
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       margin: 10px 0;
-      border-radius: 4px;
+      padding: 10px 18px;
+      background-color: #9BFF18;
+      color: black;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+    
+    .btn:hover {
+      background-color: #81cb1f;
+    }
+    
+    .btn:active {
+      transform: translateY(1px);
+    }
+    
+    .btn-icon {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .preview-container {
+      position: relative;
+      width: 100%;
+      margin: 12px 0;
+      border-radius: 8px;
+      overflow: hidden;
       display: none;
+    }
+    
+    #preview {
+      width: 100%;
+      display: block;
+      border-radius: 8px;
+      border: 1px solid #eaeaea;
+    }
+    
+    .result-container {
+      width: 100%;
+      margin-top: 16px;
+    }
+    
+    .result-label {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #555;
+    }
+    
+    #result {
+      padding: 12px;
+      border: 1px solid #eaeaea;
+      border-radius: 6px;
+      width: 100%;
+      min-height: 60px;
+      word-break: break-all;
+      background-color: #f8f9fa;
+      font-family: monospace;
+      font-size: 13px;
+      display: none;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      margin-top: 12px;
+    }
+    
+    .open-url-btn {
+      background-color: #9BFF18;
+      flex: 1;
+    }
+    
+    .open-url-btn:hover {
+      background-color: #81cb1f;
+    }
+    
+    .copy-btn {
+      background-color: #9BFF18;
+      flex: 1;
+    }
+    
+    .copy-btn:hover {
+      background-color: #81cb1f;
+    }
+    
+    .status {
+      margin-top: 12px;
+      font-size: 13px;
+      color: white;
+      text-align: center;
+      height: 18px;
+    }
+    
+    .loading {
+      display: none;
+      width: 100%;
+      height: 3px;
+      background-color: #f0f0f0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+    
+    .loading-bar {
+      height: 100%;
+      width: 30%;
+      background-color: #9BFF18;
+      border-radius: 3px;
+      animation: loading 1.5s infinite ease-in-out;
+    }
+    
+    @keyframes loading {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(350%); }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>QR Code Scanner</h2>
-    <button id="scanButton">Scan Current Page</button>
-    <img id="preview" alt="Screenshot preview">
-    <div id="result"></div>
+    <div class="header" style="justify-content: center; text-align: center;">
+      <h2 style="width: 100%; color: white;">QR Code Scanner</h2>
+    </div>
+    
+    <button id="scanButton" class="btn">
+      <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"></path>
+        <rect x="7" y="7" width="10" height="10" rx="2"></rect>
+      </svg>
+      Scan Current Page
+    </button>
+    
+    <div class="loading" id="loadingBar">
+      <div class="loading-bar"></div>
+    </div>
+    
+    <div class="preview-container" id="previewContainer">
+      <img id="preview" alt="Screenshot preview">
+    </div>
+    
+    <div class="result-container">
+      <div class="result-label" id="resultLabel" style="color: white;">Detected QR Code:</div>
+      <div id="result"></div>
+      
+      <div class="actions" id="resultActions">
+        <button class="btn open-url-btn" id="openUrlBtn">
+          <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          Open URL
+        </button>
+        
+        <button class="btn copy-btn" id="copyBtn">
+          <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          Copy Text
+        </button>
+      </div>
+    </div>
+    
+    <div class="status" id="statusMessage"></div>
   </div>
+
   <script src="jsQR.js"></script>
   <script src="popup.js"></script>
 </body>
