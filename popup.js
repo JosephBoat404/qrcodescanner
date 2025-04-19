@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const resultDiv = document.getElementById('result');
   const previewImg = document.getElementById('preview');
 
-  // First, verify we can capture a screenshot
+  // Use only screenshot functionality, no camera
   scanButton.addEventListener('click', async () => {
     try {
       // Get the current active tab
