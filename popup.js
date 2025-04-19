@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   const scanButton = document.getElementById('scanButton');
+  const closeButton = document.getElementById('closeButton');
   const preview = document.getElementById('preview');
   const previewContainer = document.getElementById('previewContainer');
   const result = document.getElementById('result');
@@ -146,5 +147,10 @@ document.addEventListener('DOMContentLoaded', function() {
           statusMessage.textContent = 'Failed to copy: ' + err;
         });
     }
+  });
+
+  // Add close button functionality
+  closeButton.addEventListener('click', function() {
+    window.close();
   });
 });
