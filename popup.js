@@ -10,11 +10,15 @@ document.addEventListener('DOMContentLoaded', function() {
   const copyBtn = document.getElementById('copyBtn');
   const statusMessage = document.getElementById('statusMessage');
   const loadingBar = document.getElementById('loadingBar');
+  const currentYear = document.getElementById('currentYear');
 
   // Initially hide results and actions
   result.style.display = 'none';
   resultActions.style.display = 'none';
   resultLabel.style.display = 'none';
+
+  // Set current year in copyright
+  currentYear.textContent = new Date().getFullYear();
 
   scanButton.addEventListener('click', async function() {
     try {
