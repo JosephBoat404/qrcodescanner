@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "QR Code Scanner",
+  "name": "WebQR Scanner",
   "version": "1.0",
   "description": "Scan QR codes directly from web pages",
   "permissions": [
