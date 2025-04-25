@@ -22,9 +22,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 // Handle context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === 'scanQRCode') {
-    chrome.tabs.sendMessage(tab.id, {
-      action: 'scanQRCode',
-      imageData: info.srcUrl
+    // Use activeTab permission instead of tabs
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      function: (imageData) => {
+        // Send message to content script
+        window.postMessage({ action: 'scanQRCode', imageData }, '*');
+      },
+      args: [info.srcUrl]
     });
   }
 });

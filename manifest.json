@@ -5,11 +5,7 @@
   "description": "Scan QR codes directly from web pages",
   "permissions": [
     "activeTab",
-    "scripting",
-    "contextMenus",
-    "storage",
-    "tabs",
-    "tabCapture"
+    "contextMenus"
   ],
   "host_permissions": [
     "<all_urls>"
